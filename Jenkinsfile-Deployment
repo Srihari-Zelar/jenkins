@@ -3,6 +3,10 @@ pipeline {
         label "ANSIBLE"
     }
 
+    environment {
+        UBUNTU_SSH_PASSWORD = credentials('UBUNTU_SSH_PASSWORD')
+    }
+
     parameters {
         choice(name: 'ENV', choices: ['dev', 'prod' ], description: 'Select Environment')
         string(name: 'COMPONENT', defaultValue: '', description: 'Which Component to deploy')
