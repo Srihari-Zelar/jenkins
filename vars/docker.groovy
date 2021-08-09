@@ -1,7 +1,7 @@
 def call(Map params = [:]) {
 
-  def args= [
-  SLAVE_LABEL : "DOCKER"
+  def args = [
+          SLAVE_LABEL : "DOCKER"
   ]
   args << params
 
@@ -23,14 +23,34 @@ def call(Map params = [:]) {
       APP_TYPE      = "${args.APP_TYPE}"
     }
 
-    stages  {
-      stage('Build code & Install Dependencies')  {
-        steps{
+    stages {
+
+      stage('Docker Build') {
+        steps {
+          script {
+            get_branch = "env | grep GIT_BRANCH | awk -F / '{print \$NF}' | xargs echo -n"
+            env.get_branch_exec=sh(returnStdout: true, script: get_branch)
+          }
           sh '''
-            docker build -t local .
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 799623766947.dkr.ecr.us-east-1.amazonaws.com
+            docker build -t 799623766947.dkr.ecr.us-east-1.amazonaws.com/${COMPONENT}:${get_branch_exec} .
           '''
         }
       }
+
+      stage('Docker Push') {
+        steps {
+          script {
+            get_branch = "env | grep GIT_BRANCH | awk -F / '{print \$NF}' | xargs echo -n"
+            env.get_branch_exec=sh(returnStdout: true, script: get_branch)
+          }
+          sh '''
+            docker push 799623766947.dkr.ecr.us-east-1.amazonaws.com/${COMPONENT}:${get_branch_exec}
+          '''
+        }
+      }
+
     }
+
   }
 }
