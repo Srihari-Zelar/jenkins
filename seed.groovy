@@ -54,7 +54,7 @@ pipelineJob("Deployment Pipeline") {
           }
         }
       }
-      'scriptPath'('Jenkinsfile-Deployment')
+      'scriptPath'('Jenkinsfile-Docker')
       'lightweight'(true)
     }
   }
